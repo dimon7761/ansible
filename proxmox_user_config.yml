@@ -1,0 +1,12 @@
+users:
+   - { name: testuser1, pass: $5$XIFI3.b7ciwBaZ$PMXTZP4m9QpR5w5O/GpOlG3XR06gBACKv40pIM3btd5, group: Administrator }
+   - { name: testuser2, pass: $5$XIFI3.b7ciwBaZ$PMXTZP4m9QpR5w5O/GpOlG3XR06gBACKv40pIM3btd5, group: PVEAdmin }
+   - { name: testuser3, pass: $5$XIFI3.b7ciwBaZ$PMXTZP4m9QpR5w5O/GpOlG3XR06gBACKv40pIM3btd5, group: PVEVMAdmin }
+   - { name: testuser4, pass: $5$XIFI3.b7ciwBaZ$PMXTZP4m9QpR5w5O/GpOlG3XR06gBACKv40pIM3btd5, group: Deleted }
+
+group:
+   - { name: Administrator, role: Administrator }
+   - { name: PVEAdmin, role: PVEAdmin }
+   - { name: PVEVMAdmin, role: PVEVMAdmin }
+
+ssh: Administrator, 

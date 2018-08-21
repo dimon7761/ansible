@@ -1,0 +1,59 @@
+- hosts: proxmox
+  become: yes 
+  become_user: root
+  become_method: sudo
+  gather_facts: False
+  vars_files:
+   - proxmox_user_config.yml
+  tasks:
+
+  - name: "Clear Config"
+    shell: |
+         echo /dev/null > /etc/pve/priv/shadow.cfg
+         echo /dev/null > /etc/pve/user.cfg
+
+  - name: "Del user" 
+    user:
+             name: "{{ item.name }}"
+             state: absent
+             remove: true
+    with_items: "{{ users }}"
+    when: '"{{ item.group }}" == "Deleted"'
+
+  - name: "Add Group"
+    shell: |
+        pveum groupadd {{ item.name }}
+        pveum aclmod / -group {{ item.name }} -role {{ item.role }}
+    with_items: "{{ group }}"
+
+  - name: "ADD User"
+    lineinfile: dest=/etc/pve/priv/shadow.cfg line="{{ item.name }}:{{ item.pass }}:"
+    with_items: "{{ users }}"
+    when: '"{{ item.group }}" != "Deleted"'
+
+  - name: "ADD User to group"
+    shell: pveum useradd {{ item.name }}@pve -g {{ item.group }}
+    with_items: "{{ users }}"
+    when: '"{{ item.group }}" != "Deleted"'
+
+  - name: "ADD User to SSH"
+    user:
+             name: "{{ item.name }}"
+             shell: /bin/bash
+             groups: sudo
+             append: yes
+             password: "{{ item.pass }}"
+             ssh_key_type: rsa
+    with_items: "{{ users }}"
+    when: '"{{ item.group }}" in ssh' 
+ 
+  - name: ADD authorized key
+    authorized_key:
+             user: "{{ item.name }}"
+             state: present
+             manage_dir: yes
+             key: "{{ lookup('file', 'keys/{{ item.name }}.pub') }}"
+    with_items: "{{ users }}"
+    when: '"{{ item.group }}" in ssh'
+    ignore_errors: true
+
