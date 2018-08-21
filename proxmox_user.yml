@@ -35,6 +35,7 @@
     shell: pveum useradd {{ item.name }}@pve -g {{ item.group }}
     with_items: "{{ users }}"
     when: '"{{ item.group }}" != "Deleted"'
+    ignore_errors: true
 
   - name: "ADD User to SSH"
     user:
